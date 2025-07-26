@@ -3,7 +3,6 @@ setlocal enabledelayedexpansion
 
 :: === Setup paths ===
 set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
-
 :: === Write PowerShell script ===
 > "%SCRIPT%" echo $sh = New-Object -ComObject WScript.Shell
 >> "%SCRIPT%" echo # Set system volume to approximately 30%
@@ -40,7 +39,7 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 >> "%SCRIPT%" echo             $mediaPlayer2.volume = 0.3
 >> "%SCRIPT%" echo             $mediaPlayer2.open($selectedSound)
 >> "%SCRIPT%" echo             $mediaPlayer2.Play()
->> "%SCRIPT%" echo             Start-Sleep -Milliseconds 500  # Brief wait
+>> "%SCRIPT%" echo             Start-Sleep -Milliseconds 300  # Brief wait
 >> "%SCRIPT%" echo             Write-Host "Playing random sound: $(Split-Path $selectedSound -Leaf)"
 >> "%SCRIPT%" echo         } else {
 >> "%SCRIPT%" echo             Write-Host "Warning: sound not found at $selectedSound"
@@ -55,7 +54,7 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 >> "%SCRIPT%" echo # Create application context to keep forms alive
 >> "%SCRIPT%" echo $applicationContext = New-Object System.Windows.Forms.ApplicationContext
 
->> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp0sam_of_wisdom.jpg','%~dp0hello.jpg')
+>> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp0hello.jpg', '%~dp0chula.jpg', '%~dp0dog.png', '%~dp0esan.jpg', '%~dp0ikr.png', '%~dp0love.jpg', '%~dp0mil.png', '%~dp0skin.png')
 >> "%SCRIPT%" echo $forms = @()
 >> "%SCRIPT%" echo $currentSize = 200  # Starting size
 >> "%SCRIPT%" echo $maxSize = 800      # Maximum size limit
@@ -96,12 +95,7 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 >> "%SCRIPT%" echo     
 >> "%SCRIPT%" echo     if (Test-Path $imgPath) {
 >> "%SCRIPT%" echo         $pic = New-Object Windows.Forms.PictureBox
->> "%SCRIPT%" echo         $img = [System.Drawing.Image]::FromFile($imgPath)
->> "%SCRIPT%" echo         # Randomly rotate image
->> "%SCRIPT%" echo         $rotations = @('RotateNoneFlipNone','Rotate90FlipNone','Rotate180FlipNone','Rotate270FlipNone')
->> "%SCRIPT%" echo         $randRot = $rotations[$rand.Next(0, $rotations.Count)]
->> "%SCRIPT%" echo         $img.RotateFlip([System.Drawing.RotateFlipType]::$randRot)
->> "%SCRIPT%" echo         $pic.Image = $img
+>> "%SCRIPT%" echo         $pic.Image = [System.Drawing.Image]::FromFile($imgPath)
 >> "%SCRIPT%" echo         $pic.SizeMode = 'StretchImage'
 >> "%SCRIPT%" echo         $pic.Dock = 'Fill'
 >> "%SCRIPT%" echo         $form.Controls.Add($pic)
@@ -174,6 +168,7 @@ echo Starting the image display program...
 echo Press Ctrl+C in the PowerShell window to stop
 start "" "%~f0"
 powershell -ExecutionPolicy Bypass -File "%SCRIPT%"
+
 
 echo.
 echo Program stopped. Press any key to exit.
