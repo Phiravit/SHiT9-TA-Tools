@@ -6,13 +6,32 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 
 :: === Write PowerShell script ===
 > "%SCRIPT%" echo $sh = New-Object -ComObject WScript.Shell
->> "%SCRIPT%" echo for ($i = 0; $i -lt 50; $i++) { $sh.SendKeys([char]175); Start-Sleep -Milliseconds 50 }
-
+>> "%SCRIPT%" echo # Set system volume to approximately 30%
+>> "%SCRIPT%" echo # First minimize volume, then set to 30%
+>> "%SCRIPT%" echo for ($i = 0; $i -lt 50; $i++) { $sh.SendKeys([char]174); Start-Sleep -Milliseconds 10 }  # fail safe by minimizing volume to 0%
+>> "%SCRIPT%" echo for ($i = 0; $i -lt 20; $i++) { $sh.SendKeys([char]175); Start-Sleep -Milliseconds 10 }  # Change volume here (each time is multipled by 2.5%)
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Speech
 >> "%SCRIPT%" echo $speak = New-Object System.Speech.Synthesis.SpeechSynthesizer
->> "%SCRIPT%" echo $speak.Volume = 10
 >> "%SCRIPT%" echo $speak.Rate = -2
 >> "%SCRIPT%" echo $speak.Speak("a")
+
+>> "%SCRIPT%" echo # Play vine boom sound
+>> "%SCRIPT%" echo try {
+>> "%SCRIPT%" echo     $soundPath = '%~dp0vine-boom.mp3'
+>> "%SCRIPT%" echo     if (Test-Path $soundPath) {
+>> "%SCRIPT%" echo         Add-Type -AssemblyName presentationCore
+>> "%SCRIPT%" echo         $mediaPlayer = New-Object system.windows.media.mediaplayer
+>> "%SCRIPT%" echo         $mediaPlayer.volume = 0.3
+>> "%SCRIPT%" echo         $mediaPlayer.open($soundPath)
+>> "%SCRIPT%" echo         $mediaPlayer.Play()
+>> "%SCRIPT%" echo         Start-Sleep -Milliseconds 2000  # Wait for sound to play
+>> "%SCRIPT%" echo         Write-Host "Playing sound"
+>> "%SCRIPT%" echo     } else {
+>> "%SCRIPT%" echo         Write-Host "Warning: sound not found at $soundPath"
+>> "%SCRIPT%" echo     }
+>> "%SCRIPT%" echo } catch {
+>> "%SCRIPT%" echo     Write-Host "Error playing sound: $_"
+>> "%SCRIPT%" echo }
 
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Windows.Forms
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Drawing
@@ -23,7 +42,7 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 >> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp02game.png','%~dp0hello.jpg')
 >> "%SCRIPT%" echo $forms = @()
 >> "%SCRIPT%" echo $currentSize = 200  # Starting size
->> "%SCRIPT%" echo $maxSize = 300      # Maximum size limit
+>> "%SCRIPT%" echo $maxSize = 800      # Maximum size limit
 
 >> "%SCRIPT%" echo # Function to create a new form
 >> "%SCRIPT%" echo function Create-RandomForm {
