@@ -6,13 +6,32 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 
 :: === Write PowerShell script ===
 > "%SCRIPT%" echo $sh = New-Object -ComObject WScript.Shell
->> "%SCRIPT%" echo for ($i = 0; $i -lt 50; $i++) { $sh.SendKeys([char]175); Start-Sleep -Milliseconds 50 }
-
+>> "%SCRIPT%" echo # Set system volume to approximately 30%
+>> "%SCRIPT%" echo # First minimize volume, then set to 30%
+>> "%SCRIPT%" echo for ($i = 0; $i -lt 50; $i++) { $sh.SendKeys([char]174); Start-Sleep -Milliseconds 10 }  # fail safe by minimizing volume to 0%
+>> "%SCRIPT%" echo for ($i = 0; $i -lt 20; $i++) { $sh.SendKeys([char]175); Start-Sleep -Milliseconds 10 }  # Change volume here (each time is multipled by 2.5%)
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Speech
 >> "%SCRIPT%" echo $speak = New-Object System.Speech.Synthesis.SpeechSynthesizer
->> "%SCRIPT%" echo $speak.Volume = 100
 >> "%SCRIPT%" echo $speak.Rate = -2
 >> "%SCRIPT%" echo $speak.Speak("a")
+
+>> "%SCRIPT%" echo # Play vine boom sound
+>> "%SCRIPT%" echo try {
+>> "%SCRIPT%" echo     $soundPath = '%~dp0vine-boom.mp3'
+>> "%SCRIPT%" echo     if (Test-Path $soundPath) {
+>> "%SCRIPT%" echo         Add-Type -AssemblyName presentationCore
+>> "%SCRIPT%" echo         $mediaPlayer = New-Object system.windows.media.mediaplayer
+>> "%SCRIPT%" echo         $mediaPlayer.volume = 0.3
+>> "%SCRIPT%" echo         $mediaPlayer.open($soundPath)
+>> "%SCRIPT%" echo         $mediaPlayer.Play()
+>> "%SCRIPT%" echo         Start-Sleep -Milliseconds 2000  # Wait for sound to play
+>> "%SCRIPT%" echo         Write-Host "Playing sound"
+>> "%SCRIPT%" echo     } else {
+>> "%SCRIPT%" echo         Write-Host "Warning: sound not found at $soundPath"
+>> "%SCRIPT%" echo     }
+>> "%SCRIPT%" echo } catch {
+>> "%SCRIPT%" echo     Write-Host "Error playing sound: $_"
+>> "%SCRIPT%" echo }
 
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Windows.Forms
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Drawing
@@ -22,21 +41,29 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 
 >> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp02game.png','%~dp0hello.jpg')
 >> "%SCRIPT%" echo $forms = @()
+>> "%SCRIPT%" echo $currentSize = 200  # Starting size
+>> "%SCRIPT%" echo $maxSize = 800      # Maximum size limit
 
 >> "%SCRIPT%" echo # Function to create a new form
 >> "%SCRIPT%" echo function Create-RandomForm {
 >> "%SCRIPT%" echo     $rand = New-Object System.Random
 >> "%SCRIPT%" echo     $screenWidth = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width
 >> "%SCRIPT%" echo     $screenHeight = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height
->> "%SCRIPT%" echo     $x = $rand.Next(0, $screenWidth - 300)
->> "%SCRIPT%" echo     $y = $rand.Next(0, $screenHeight - 300)
+>> "%SCRIPT%" echo     
+>> "%SCRIPT%" echo     # Calculate position to keep form on screen
+>> "%SCRIPT%" echo     $maxX = [Math]::Max(0, $screenWidth - $script:currentSize)
+>> "%SCRIPT%" echo     $maxY = [Math]::Max(0, $screenHeight - $script:currentSize)
+>> "%SCRIPT%" echo     $x = $rand.Next(0, $maxX)
+>> "%SCRIPT%" echo     $y = $rand.Next(0, $maxY)
 
 >> "%SCRIPT%" echo     $form = New-Object Windows.Forms.Form
 >> "%SCRIPT%" echo     $form.FormBorderStyle = 'None'
 >> "%SCRIPT%" echo     $form.TopMost = $true
 >> "%SCRIPT%" echo     $form.StartPosition = 'Manual'
 >> "%SCRIPT%" echo     $form.Location = New-Object System.Drawing.Point($x, $y)
->> "%SCRIPT%" echo     $form.Size = New-Object System.Drawing.Size(300,300)
+>> "%SCRIPT%" echo     $form.Size = New-Object System.Drawing.Size($script:currentSize, $script:currentSize)
+>> "%SCRIPT%" echo     
+>> "%SCRIPT%" echo     Write-Host "Creating form with size: $($script:currentSize)x$($script:currentSize)"
 
 >> "%SCRIPT%" echo     $imgPath = $images[$rand.Next(0, $images.Count)]
 >> "%SCRIPT%" echo     if (Test-Path $imgPath) {
@@ -48,12 +75,20 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 >> "%SCRIPT%" echo     }
 
 >> "%SCRIPT%" echo     $form.Show()
+>> "%SCRIPT%" echo     
+>> "%SCRIPT%" echo     # Increase size for next form (add 100x100)
+>> "%SCRIPT%" echo     if ($script:currentSize -lt $script:maxSize) {
+>> "%SCRIPT%" echo         $script:currentSize += 100
+>> "%SCRIPT%" echo     } else {
+>> "%SCRIPT%" echo         Write-Host "Maximum size reached: $($script:maxSize)x$($script:maxSize)"
+>> "%SCRIPT%" echo     }
+>> "%SCRIPT%" echo     
 >> "%SCRIPT%" echo     return $form
 >> "%SCRIPT%" echo }
 
 >> "%SCRIPT%" echo # Main timer to create new forms periodically
 >> "%SCRIPT%" echo $mainTimer = New-Object Windows.Forms.Timer
->> "%SCRIPT%" echo $mainTimer.Interval = 100  # Create new form every 1 second
+>> "%SCRIPT%" echo $mainTimer.Interval = 1000  # Create new form every 1 second
 >> "%SCRIPT%" echo $mainTimer.Add_Tick({
 >> "%SCRIPT%" echo     $newForm = Create-RandomForm
 >> "%SCRIPT%" echo     $script:forms += $newForm
@@ -68,6 +103,7 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 >> "%SCRIPT%" echo try {
 >> "%SCRIPT%" echo     [System.Windows.Forms.Application]::Run()
 >> "%SCRIPT%" echo } finally {
+>> "%SCRIPT%" echo     # Clean up forms when stopping
 >> "%SCRIPT%" echo     foreach ($form in $forms) {
 >> "%SCRIPT%" echo         if ($form -and !$form.IsDisposed) {
 >> "%SCRIPT%" echo             $form.Close()
