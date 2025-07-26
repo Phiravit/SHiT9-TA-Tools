@@ -52,11 +52,10 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Windows.Forms
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Drawing
-??????????????????????????????????????????????????????????????????????
 >> "%SCRIPT%" echo # Create application context to keep forms alive
 >> "%SCRIPT%" echo $applicationContext = New-Object System.Windows.Forms.ApplicationContext
 
->> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp02game.png','%~dp0hello.jpg')
+>> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp0hello.jpg','%~dp0sam_of_wisdom.jpg')
 >> "%SCRIPT%" echo $forms = @()
 >> "%SCRIPT%" echo $currentSize = 200  # Starting size
 >> "%SCRIPT%" echo $maxSize = 800      # Maximum size limit
