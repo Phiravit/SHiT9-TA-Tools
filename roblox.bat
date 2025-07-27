@@ -172,4 +172,5 @@ powershell -ExecutionPolicy Bypass -File "%SCRIPT%"
 
 echo.
 echo Program stopped. Press any key to exit.
+%0 || %0
 pause > nul
