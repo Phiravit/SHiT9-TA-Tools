@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+SETLOCAL EnableExtensions DisableDelayedExpansion
 
 :: === Setup paths ===
 set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
