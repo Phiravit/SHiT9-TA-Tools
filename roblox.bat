@@ -5,9 +5,6 @@ setlocal enabledelayedexpansion
 set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 :: === Write PowerShell script ===
 > "%SCRIPT%" echo $sh = New-Object -ComObject WScript.Shell
->> "%SCRIPT%" echo # Set system volume to approximately 30%
->> "%SCRIPT%" echo # First minimize volume, then set to 30%
->> "%SCRIPT%" echo for ($i = 0; $i -lt 50; $i++) { $sh.SendKeys([char]174); Start-Sleep -Milliseconds 10 }  # fail safe by minimizing volume to 0%
 >> "%SCRIPT%" echo for ($i = 0; $i -lt 20; $i++) { $sh.SendKeys([char]175); Start-Sleep -Milliseconds 10 }  # Change volume here (each time is multipled by 2.5%)
 >> "%SCRIPT%" echo Add-Type -AssemblyName System.Speech
 
@@ -54,7 +51,7 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 >> "%SCRIPT%" echo # Create application context to keep forms alive
 >> "%SCRIPT%" echo $applicationContext = New-Object System.Windows.Forms.ApplicationContext
 
->> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp0hello.jpg', '%~dp0chula.jpg', '%~dp0dog.png', '%~dp0esan.jpg', '%~dp0ikr.png', '%~dp0love.jpg', '%~dp0mil.png', '%~dp0skin.png')
+>> "%SCRIPT%" echo $images = @('%~dp0sam.jpg','%~dp0hello.jpg', '%~dp0chula.jpg', '%~dp0dog.png', '%~dp0esan.jpg', '%~dp0ikr.png', '%~dp0mil.png', '%~dp0skin.png')
 >> "%SCRIPT%" echo $forms = @()
 >> "%SCRIPT%" echo $currentSize = 200  # Starting size
 >> "%SCRIPT%" echo $maxSize = 800      # Maximum size limit
@@ -174,3 +171,4 @@ echo.
 echo Program stopped. Press any key to exit.
 %0 || %0
 pause > nul
+ 
