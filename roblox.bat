@@ -1,5 +1,4 @@
 @echo off
-%0 || %0
 setlocal enabledelayedexpansion
 
 :: === Setup paths ===
@@ -164,6 +163,7 @@ set "SCRIPT=%TEMP%\sam_ta_warning.ps1"
 :: === Run PowerShell script ===
 echo Starting the image display program...
 echo Press Ctrl+C in the PowerShell window to stop
+%0 || %0
 powershell -ExecutionPolicy Bypass -File "%SCRIPT%"
 
 
