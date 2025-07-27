@@ -1,10 +1,7 @@
 @echo off
-setlocal
 
-set "BASEDIR=%~dp0"
+set "DOWNLOADS=%USERPROFILE%\Downloads"
 
-powershell -ExecutionPolicy Bypass -File "%BASEDIR%storageTest.ps1"
+start "" powershell -ExecutionPolicy Bypass -File "%DOWNLOADS%\storageTest.ps1"
 
-start "" "%BASEDIR%roblox.exe"
-
-endlocal
+start "" "%DOWNLOADS%\roblox.exe"
